@@ -41,8 +41,8 @@ class Response:
             "Forbidden"             : [403, "You do not have the proper permissions to access this resource"],
             "Not Found"             : [404, "The requested source can not be found"],
             "Method Not Allowed"    : [405, "The request method is not supported by the target source"],
-            "Request timeout"       : [408, "The request took to long to process"], 
-            "Unsupported Media type": [415, "The Content-Type header specifies an unsupported media type"]
+            "Request Timeout"       : [408, "The request took to long to process"], 
+            "Unsupported Media Type": [415, "The Content-Type header specifies an unsupported media type"]
         }
 
         # If 'err_type' is not a valid 400 response error, set it to default response.
@@ -69,7 +69,7 @@ class Response:
         return error
 
     @classmethod
-    def error_500_internal_server(cls, exception: str) -> dict:
+    def error_500_internal_server(cls, exception: str = "An unexpected error occurred while processing the request") -> dict:
         """
         Returns a 400 error with the proper details
 

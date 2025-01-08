@@ -6,9 +6,11 @@ with open('README.md', 'r', encoding='utf-8') as file:
 
 setup(
     name="just_simplify_api",
-    version="1.0.0",
+    version="1.0.2",
     packages=find_packages(),
-    description="Mesh API tools for consistent response formatting and validation",
+    description="API tools for consistent response formatting and validation",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Preston Hollis",
     author_email="thomas.preston.hollis@gmail.com",
     url="https://github.com/tphollis/api-tools",
@@ -17,5 +19,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
 )
