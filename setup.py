@@ -1,7 +1,11 @@
 from setuptools import setup, find_packages
 
+# Read the README file
+with open('README.md', 'r', encoding='utf-8') as file:
+    long_description = file.read()
+
 setup(
-    name="api-simplify",
+    name="just_simplify_api",
     version="1.0.0",
     packages=find_packages(),
     description="Mesh API tools for consistent response formatting and validation",
