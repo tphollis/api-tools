@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="api-tools",
+    name="api-simplify",
     version="1.0.0",
     packages=find_packages(),
     description="Mesh API tools for consistent response formatting and validation",
