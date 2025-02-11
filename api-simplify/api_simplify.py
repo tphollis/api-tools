@@ -61,7 +61,7 @@ class Response:
 
         # Add any other provided details to the error response.
         for key, value in kwargs.items():
-            error["details"][key] = value
+            error["body"]["details"][key] = value
 
         # Log the event
         print(f"{err_details[err_type][0]}: {err_type} = {err_details[err_type][1]}")

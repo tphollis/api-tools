@@ -1,6 +1,9 @@
 # Just Simplify API
 Clean up your API function of tedious response and verification code. Make it easier to see what your API is doing and ensure consistency with all your responses!
 
+## Versioning
+1.0.0 - Initial release
+
 ## Verrify incomming body values
 Verifying every value that comes with the request can be tedious and take up a lot of space in your code. Now you can verify all your incomming values with a single function! Heres how:
 <br>
