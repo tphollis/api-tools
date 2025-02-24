@@ -39,7 +39,7 @@ class Response:
             "Invalid Credentials"   : [401, "The credentials procided are invalid"],
             "Payment Required"      : [402, "Payment must be made for the request to go through"],
             "Forbidden"             : [403, "You do not have the proper permissions to access this resource"],
-            "Not Found"             : [404, "The requested source can not be found"],
+            "Not Found"             : [404, "The path provided can not be found"],
             "Method Not Allowed"    : [405, "The request method is not supported by the target source"],
             "Request Timeout"       : [408, "The request took to long to process"], 
             "Unsupported Media Type": [415, "The Content-Type header specifies an unsupported media type"]
@@ -114,6 +114,44 @@ class Response:
         print(f"{code}: Success")
 
         return response
+    
+class ParseRequest:
+    """
+    This class contains methouds to parse the request based on different
+    function hosts.
+    """
+
+    @classmethod
+    def firebase(cls, request) -> dict:
+        """
+        Grabs the arguments based on the methoud used and returns them as
+        a dictionary.
+
+        PARAMETERS:
+            request = the request object
+        """
+        # Parse out the methoud, path, and headers
+        method = request.method
+        path = request.path
+        headers = request.headers
+
+        # Parse out the arguments based on the methoud/content-type used
+        if method == "GET":
+            args = request.args.to_dict()
+    
+        else:
+            content_type = headers.get("Content-Type", '')
+
+            if 'multipart/form-data' in content_type:
+                args = request.form.to_dict()
+                files = request.files
+            else:
+                try:
+                    args = request.get_json()
+                except:
+                    raise Exception(Response.error_400_bad_request(err_type="Bad Request"))
+        
+        return (method, path, headers, args, files)
 
 class Validate:
     """
@@ -206,17 +244,17 @@ class Validate:
                 # The contents are invalid. Add it to invalid_parameters.
                 invalid_parameters.append(parameter)
 
-        # If there are any missing parameters, return this error first.
+        # If there are any missing parameters, raise this error first.
         if missing_parameters:
-            return Response.error_400_bad_request("Missing Parameters", missingParameters=missing_parameters)
+            raise Exception(Response.error_400_bad_request("Missing Parameters", missingParameters=missing_parameters))
 
-        # If there are no missing parameters but some contain invalid values, return this error.
+        # If there are no missing parameters but some contain invalid values, raise this error.
         elif invalid_parameters:
-            return Response.error_400_bad_request("Invalid Values", invalidValues=invalid_parameters)
+            raise Exception(Response.error_400_bad_request("Invalid Values", invalidValues=invalid_parameters))
 
         # All the required parameters are accounted for and valid.
         else:
-            return None
+            return
 
     @classmethod
     def missing_parameters(cls, args, required_args: list) -> list:
