@@ -11,14 +11,14 @@ simplified coding for your API function.
 
 ### LIBRARIES ###
 import re #Allows for matching values to patterns.
-
+from datetime import datetime #Allows for date and time operations.
 class Response:
     """
     This class contains methouds that help maintain consistent
     responses.
     """
     @classmethod
-    def error_400_bad_request(cls, err_type: str = None, **kwargs) -> dict:
+    def error_400_bad_request(cls, err_type: str = "Bad Request", **kwargs) -> dict:
         """
         Returns a 400 error with the proper details
 
@@ -46,7 +46,7 @@ class Response:
         }
 
         # If 'err_type' is not a valid 400 response error, set it to default response.
-        if err_type is None or err_type not in err_details:
+        if  err_type not in err_details:
             err_type = "Bad Request"
 
         # Generate the error response based on the 'err_type'
@@ -111,7 +111,7 @@ class Response:
         }
 
         # Log the event
-        print(f"{code}: Success")
+        print(f"{code}: {result}")
 
         return response
     
@@ -131,25 +131,31 @@ class ParseRequest:
             request = the request object
         """
         # Parse out the methoud, path, and headers
-        method = request.method
-        path = request.path
-        headers = request.headers
+        try:
+            method = request.method
+            path = request.path
+            headers = request.headers
+            files = None
+            args = None
+        except Exception as error:
+            print(error)
+            raise Exception(Response.error_400_bad_request(err_type="Bad Request", details="Failed to parse out the method, path, and headers"))
 
         # Parse out the arguments based on the methoud/content-type used
-        if method == "GET":
-            args = request.args.to_dict()
-    
-        else:
-            content_type = headers.get("Content-Type", '')
-
-            if 'multipart/form-data' in content_type:
-                args = request.form.to_dict()
-                files = request.files
+        try:
+            if method == "GET":
+                args = request.args.to_dict()
+        
             else:
-                try:
+                content_type = headers.get("Content-Type", '')
+
+                if 'multipart/form-data' in content_type:
+                    args = request.form.to_dict()
+                    files = request.files
+                else:
                     args = request.get_json()
-                except:
-                    raise Exception(Response.error_400_bad_request(err_type="Bad Request"))
+        except Exception as error:
+            raise Exception(Response.error_400_bad_request(err_type="Unsupported Media Type"))
         
         return (method, path, headers, args, files)
 
@@ -239,6 +245,8 @@ class Validate:
                 or (details['type'] == "list"       and not cls.is_list(value))
                 or (details['type'] == "dictionary" and not cls.is_dict(value))
                 or (details['type'] == "selection"  and not cls.is_selection(value, details["options"]))
+                or (details['type'] == "date"       and not cls.is_date(value))
+                or (details['type'] == "date and time"  and not cls.is_date_time(value))
                 ):
 
                 # The contents are invalid. Add it to invalid_parameters.
@@ -338,21 +346,24 @@ class Validate:
     @classmethod
     def is_number(cls, value) -> bool:
         """
-        Checks to see if the value is a number type
+        Checks to see if the value is a number type or a string that can be converted to a number.
         """
-        return isinstance(value, (int, float))
+        if isinstance(value, (int, float)) or (isinstance(value, str) and value.replace(".", "").isdigit()):
+            return True
+        else:
+            return False
 
     @classmethod
     def is_list(cls, value) -> bool:
         """
-        Checks to see if the value is a number type
+        Checks to see if the value is a list type
         """
         return isinstance(value, list)
 
     @classmethod
     def is_dict(cls, value) -> bool:
         """
-        Checks to see if the value is a number type
+        Checks to see if the value is a dictionary type
         """
         return isinstance(value, dict)
 
@@ -362,3 +373,25 @@ class Validate:
         Checks to see if the value equals one of the provided options.
         """
         return value in options
+    
+    @classmethod
+    def is_date(cls, value) -> bool:
+        """
+        Checks to see if the value is an ISO 8601 formated date.
+        """
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+            return True
+        except ValueError:
+            return False
+
+    @classmethod
+    def is_date_time(cls, value) -> bool:
+        """
+        Checks to see if the value is an ISO 8601 formated date and time.
+        """
+        try:
+            datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            return True
+        except ValueError:
+            return False
