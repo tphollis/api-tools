@@ -93,7 +93,7 @@ class Response:
         return error
 
     @classmethod
-    def success_200_response(cls, code = 200, result = {}) -> dict:
+    def success_200_response(cls, code = 200, status = "success", result = {}) -> dict:
         """
         Returns a 200 success message with the required details.
 
@@ -105,7 +105,7 @@ class Response:
         response = {
             "statusCode": code,
             "body": {
-                "status": "success",
+                "status": status,
                 "details": result
             }
         }
@@ -346,24 +346,21 @@ class Validate:
     @classmethod
     def is_number(cls, value) -> bool:
         """
-        Checks to see if the value is a number type or a string that can be converted to a number.
+        Checks to see if the value is a number type
         """
-        if isinstance(value, (int, float)) or (isinstance(value, str) and value.replace(".", "").isdigit()):
-            return True
-        else:
-            return False
+        return isinstance(value, (int, float))
 
     @classmethod
     def is_list(cls, value) -> bool:
         """
-        Checks to see if the value is a list type
+        Checks to see if the value is a number type
         """
         return isinstance(value, list)
 
     @classmethod
     def is_dict(cls, value) -> bool:
         """
-        Checks to see if the value is a dictionary type
+        Checks to see if the value is a number type
         """
         return isinstance(value, dict)
 
